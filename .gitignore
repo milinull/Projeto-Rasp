@@ -1,0 +1,52 @@
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependências
+node_modules/
+
+# Variáveis de ambiente
+.env
+.env.*
+!.env.example
+
+# Build
+dist/
+build/
+out/
+coverage/
+
+# Arquivos temporários
+tmp/
+temp/
+.cache/
+
+# Arquivos compactados
+*.zip
+*.tar
+*.gz
+*.rar
+
+# Certificados e chaves
+*.pem
+*.key
+
+# Arquivos de configuração local
+*.local
+
+# Git
+*.orig

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Clínico — UTI (Vertical)</title>
+  <style>
+    /*
+      CSS: ESTILOS DA PÁGINA
+    */
+
+    /* Reset básico para garantir que a página ocupe 100% do espaço sem margens nativas */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f0f4f8; 
+      color: #334155;
+      overflow: hidden; /* Impede a rolagem da tela */
+    }
+
+    /* Container principal que centraliza e limita a largura do conteúdo */
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 24px 20px; 
+      max-width: 600px; 
+      margin: 0 auto;
+    }
+
+    /* Cabeçalho Hospitalar (Topo da tela) */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .header-info { display: flex; align-items: center; gap: 12px; }
+
+    .brand-icon {
+      width: 28px; height: 28px;
+      background-color: #0097a7;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: bold; font-size: 16px;
+    }
+
+    .header-title {
+      font-size: 1.3rem; font-weight: 600;
+      color: #0f172a; letter-spacing: 1px;
+    }
+
+    /* Relógio digital no cabeçalho */
+    .header-time {
+      font-size: 1.6rem; font-weight: 500;
+      color: #0097a7; font-variant-numeric: tabular-nums;
+    }
+
+    /* Área Central - Onde fica o cartão de status principal */
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: stretch; 
+      padding: 24px 0;
+    }
+
+    /* Cartão que muda de cor conforme o volume do áudio */
+    .status-card {
+      background-color: #ffffff;
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center; 
+      text-align: center;
+      border-top: 8px solid #e2e8f0;
+      /* Transição suave (0.4s) ao mudar de cor */
+      transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+    }
+
+    /* Círculo decorativo dentro do cartão */
+    .indicator-ring {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background-color: #f8fafc;
+      border: 12px solid #e2e8f0;
+      margin-bottom: 32px;
+      transition: border-color 0.4s ease, background-color 0.4s ease;
+    }
+
+    .status-title {
+      font-size: 1.8rem; font-weight: 600;
+      color: #64748b; text-transform: uppercase;
+      letter-spacing: 2px; margin-bottom: 16px;
+      transition: color 0.4s ease;
+    }
+
+    .status-message {
+      font-size: 4rem; font-weight: 800;
+      color: #0f172a; line-height: 1.1;
+      text-transform: uppercase;
+      transition: color 0.4s ease;
+      word-wrap: break-word; padding: 0 10px;
+    }
+
+    /* CLASSES DE ESTADO (Controladas pelo JavaScript) */
+    
+    /* Estado Vermelho: Alerta / Fala Muito Alta (inclui animação de piscar) */
+    .card-red { 
+      background-color: #ef4444; border-top-color: #b91c1c; 
+      animation: alert-light-red 2s ease-in-out infinite;
+    }
+    .card-red .indicator-ring { border-color: #ffffff; background-color: #b91c1c; }
+    .card-red .status-title { color: #fee2e2; }
+    .card-red .status-message { color: #ffffff; }
+
+    /* Estado Amarelo: Monitoramento / Conversa (inclui animação suave) */
+    .card-yellow { 
+      background-color: #f59e0b; border-top-color: #b45309; 
+      animation: alert-light-yellow 4s ease-in-out infinite;
+    }
+    .card-yellow .indicator-ring { border-color: #ffffff; background-color: #d97706; }
+    .card-yellow .status-title { color: #fef3c7; }
+    .card-yellow .status-message { color: #ffffff; }
+
+    /* Estado Verde: Estável / Silêncio (estado padrão, sem animação) */
+    .card-green { background-color: #10b981; border-top-color: #047857; }
+    .card-green .indicator-ring { border-color: #ffffff; background-color: #059669; }
+    .card-green .status-title { color: #d1fae5; }
+    .card-green .status-message { color: #ffffff; }
+
+    /* Indicador visual de conexão do WebSocket (Canto inferior direito) */
+    .connection-status {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444; /* Vermelho padrão (desconectado) */
+    }
+    .dot.connected { background-color: #10b981; /* Verde quando conectado */ }
+
+    /* Animações (Keyframes) para dar o efeito de "luz de alerta" pulsante */
+    @keyframes alert-light-red {
+      0%, 100% { background-color: #ef4444; box-shadow: 0 0 40px rgba(239, 68, 68, 0.8); }
+      50% { background-color: #991b1b; box-shadow: 0 0 10px rgba(153, 27, 27, 0.2); }
+    }
+    @keyframes alert-light-yellow {
+      0%, 100% { background-color: #f59e0b; box-shadow: 0 0 30px rgba(245, 158, 11, 0.6); }
+      50% { background-color: #b45309; box-shadow: 0 0 10px rgba(180, 83, 9, 0.1); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <header class="header">
+      <div class="header-info">
+        <div class="brand-icon">+</div>
+        <div class="header-title">UTI-A • LEITO 07</div>
+      </div>
+      <div class="header-time" id="clock">00:00:00</div>
+    </header>
+
+    <main class="main-content">
+      <div class="status-card card-green" id="status-card">
+        <div class="indicator-ring" id="indicator-ring"></div>
+        <div class="status-title" id="status-title">Estável</div>
+        <div class="status-message" id="status-message">SILÊNCIO</div>
+      </div>
+    </main>
+
+    <div class="connection-status">
+      <div class="dot" id="ws-dot"></div>
+      <span id="ws-text">Desconectado</span>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * JAVASCRIPT: LÓGICA E CONEXÃO
+     */
+
+    // Dicionário adaptado para refletir o nível de voz na interface
+    const states = {
+      red: { title: "ALERTA", message: "FALA ALTA" },
+      yellow: { title: "MONITORAMENTO", message: "CONVERSA" },
+      green: { title: "ESTÁVEL", message: "SILÊNCIO" }
+    };
+
+    /**
+     * Atualiza as cores e os textos do cartão principal na tela.
+     * @param {string} color - A cor recebida ('red', 'yellow' ou 'green').
+     */
+    function setStatus(color) {
+      const card = document.getElementById('status-card');
+      const title = document.getElementById('status-title');
+      const message = document.getElementById('status-message');
+      
+      // Atualiza a classe do cartão para acionar o CSS correspondente
+      card.className = `status-card card-${color}`;
+      
+      // Atualiza os textos baseado no dicionário 'states'
+      title.textContent = states[color].title;
+      message.textContent = states[color].message;
+    }
+
+    /**
+     * Atualiza o relógio digital no cabeçalho da página.
+     */
+    function updateClock() {
+      const now = new Date();
+      // Garante que horas, minutos e segundos tenham sempre 2 dígitos (ex: 09, 05)
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      
+      document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
+    }
+    
+    // Configura o relógio para atualizar a cada 1 segundo (1000 milissegundos)
+    setInterval(updateClock, 1000);
+    updateClock(); // Chama imediatamente para não esperar 1 segundo na primeira vez
+
+    /**
+     * Inicia e gerencia a conexão WebSocket com o servidor Python.
+     */
+    function connectWebSocket() {
+      const wsDot = document.getElementById('ws-dot');
+      const wsText = document.getElementById('ws-text');
+      
+      // Conecta ao servidor local (porta 8765) criado pelo Python
+      const ws = new WebSocket("ws://localhost:8765");
+
+      // Evento: Quando a conexão é estabelecida com sucesso
+      ws.onopen = () => {
+        wsDot.classList.add('connected');
+        wsText.textContent = "Conectado";
+      };
+
+      // Evento: Quando o frontend recebe uma mensagem do Python
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        // Se a mensagem contiver um "estado" válido, atualiza a tela
+        if (data.estado) {
+          setStatus(data.estado);
+        }
+      };
+
+      // Evento: Quando a conexão cai ou o servidor Python é desligado
+      ws.onclose = () => {
+        wsDot.classList.remove('connected');
+        wsText.textContent = "Tentando reconectar...";
+        setStatus('green'); // Em caso de queda, volta para o estado mais seguro (verde)
+        
+        // Tenta reconectar automaticamente a cada 3 segundos
+        setTimeout(connectWebSocket, 3000);
+      };
+
+      // Evento: Em caso de erro na comunicação
+      ws.onerror = (err) => {
+        console.error("Erro no WebSocket: ", err);
+        ws.close(); // Força o fechamento para engatilhar o onclose e tentar reconectar
+      };
+    }
+
+    // Inicia a conexão WebSocket assim que a página termina de ler o script
+    connectWebSocket();
+  </script>
+</body>
+</html>

@@ -24,6 +24,7 @@ ON sensor_data.monitoramento_audio (setor, leito, horario DESC);
 CREATE INDEX idx_monitoramento_mac 
 ON sensor_data.monitoramento_audio (mac_address, horario DESC);
 
+-- Visualizar
 SELECT * FROM sensor_data.monitoramento_audio;
 
 -- Apaga a tabela

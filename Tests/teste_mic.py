@@ -36,7 +36,7 @@ def callback(indata, frames, time, status):
 
 
 try:
-    with sd.InputStream(device=18, channels=1, samplerate=48000, callback=callback):
+    with sd.InputStream(device=21, channels=1, samplerate=48000, callback=callback):
         print("Ouvindo... (Pressione Enter para parar)")
         input()
 finally:

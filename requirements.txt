@@ -1,3 +1,5 @@
 numpy
+psycopg2
 websockets
 sounddevice
+python-dotenv

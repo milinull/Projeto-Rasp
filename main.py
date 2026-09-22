@@ -7,17 +7,17 @@ import sounddevice as sd
 
 from Scripts.ciclos_audio import CiclosAudio
 from Scripts.websocket_server import ServidorWebSocket
-from Scripts.db_client import ClienteTimescaleDB
+from Scripts.Connection.db_client import ClienteTimescaleDB
 
 # Configurações do Microfone e Áudio
-DEVICE_ID = 21
+DEVICE_ID = 6
 SAMPLE_RATE = 48000
 CHANNELS = 1
 BLOCK_SIZE = 1440
 
 # Configurações de Processamento de Som
 NOISE_GATE = 0.001
-DIGITAL_GAIN = 5.0
+DIGITAL_GAIN = 10
 ATTACK = 0.1
 RELEASE = 0.9
 MAX_BAR_LENGTH = 50
@@ -78,8 +78,8 @@ def callback(
     status_evento = audio.processar(volume_bruto)
     estado_atual = audio.estado_websocket
 
-    # Atualiza o WebSocket (Frontend)
-    ws_server.atualizar_estado(estado_atual)
+    # Atualiza o WebSocket (Frontend) forçando conversão para float nativo
+    ws_server.atualizar_estado(estado_atual, float(volume_suavizado))
 
     # Lógica de integração com o banco de dados
     agora = time.time()
@@ -128,41 +128,51 @@ def callback(
             ciclos_baseline = 0
 
     # Barra visual do terminal (Opcional, deixei comentado como no seu)
-    # tamanho_barra = min(int(volume_suavizado), MAX_BAR_LENGTH)
-    # barra = "#" * tamanho_barra
-    # print(f"\r{status_evento} [{barra:<{MAX_BAR_LENGTH}}] {volume_suavizado:05.2f} (WS: {estado_atual})", end="", flush=True)
+    tamanho_barra = min(int(volume_suavizado), MAX_BAR_LENGTH)
+    barra = "#" * tamanho_barra
+    print(
+        f"\r{status_evento} [{barra:<{MAX_BAR_LENGTH}}] {volume_suavizado:05.2f} (WS: {estado_atual})",
+        end="",
+        flush=True,
+    )
 
 
 async def main_async() -> None:
     """
     Função principal assíncrona. Inicia o servidor WebSocket e a
-    escuta do microfone simultaneamente.
+    escuta do microfone simultaneamente, permitindo troca dinâmica.
     """
-    # print(f"Iniciando escuta no dispositivo {DEVICE_ID}...")
-    # print("Servidor WebSocket rodando em ws://localhost:8765")
-    # print("Pressione [Ctrl+C] para sair")
+    global DEVICE_ID
 
     try:
-        # Inicia o servidor WebSocket para rodar em background
         servidor = await ws_server.iniciar_servidor()
 
-        # Configura e abre o canal de escuta do microfone
-        stream = sd.InputStream(
-            device=DEVICE_ID,
-            channels=CHANNELS,
-            samplerate=SAMPLE_RATE,
-            callback=callback,
-            blocksize=BLOCK_SIZE,
-        )
+        async with servidor:
+            # O loop externo permite reiniciar a gravação quando o ID mudar
+            while True:
+                stream = sd.InputStream(
+                    device=DEVICE_ID,
+                    channels=CHANNELS,
+                    samplerate=SAMPLE_RATE,
+                    callback=callback,
+                    blocksize=BLOCK_SIZE,
+                )
 
-        # Mantém o microfone e o servidor WebSocket ativos
-        with stream:
-            async with servidor:
-                # Mantém o programa rodando indefinidamente (aguardando um evento futuro que nunca chega)
-                await asyncio.Future()
+                with stream:
+                    # Fica rodando enquanto ninguém pedir para trocar de mic no painel
+                    while getattr(ws_server, "novo_mic_id", None) is None:
+                        await asyncio.sleep(0.1)
+
+                # Se saiu do loop interno, é porque o usuário escolheu outro mic na tela!
+                DEVICE_ID = ws_server.novo_mic_id
+                banco_dados.id_microfone = (
+                    DEVICE_ID  # Atualiza o ID no banco de dados também
+                )
+                ws_server.novo_mic_id = None  # Reseta o gatilho
+
+                print(f"\n[SISTEMA] Reiniciando escuta no microfone ID: {DEVICE_ID}")
 
     except Exception as e:
-        # Captura e exibe qualquer erro inesperado durante a execução
         print(f"\n[ERRO] Falha: {e}")
 
 

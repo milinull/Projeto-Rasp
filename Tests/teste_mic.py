@@ -1,3 +1,4 @@
+# Tests\teste_mic.py
 import sys
 import numpy as np
 import sounddevice as sd
@@ -36,7 +37,7 @@ def callback(indata, frames, time, status):
 
 
 try:
-    with sd.InputStream(device=21, channels=1, samplerate=48000, callback=callback):
+    with sd.InputStream(device=14, channels=1, samplerate=48000, callback=callback):
         print("Ouvindo... (Pressione Enter para parar)")
         input()
 finally:

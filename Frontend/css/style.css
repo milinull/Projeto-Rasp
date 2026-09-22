@@ -1,0 +1,396 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  background-color: #f0f4f8;
+  color: #334155;
+  overflow: hidden; /* Impede a rolagem da tela */
+}
+
+/* Container principal */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 24px 20px;
+  max-width: 600px; /* Ideal para tela de 7 polegadas */
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Cabeçalho Hospitalar */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 28px;
+  height: 28px;
+  background-color: #0097a7;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.header-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: 1px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-time {
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: #0097a7;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Botão de Engrenagem */
+.settings-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  /* Aumentando a área de toque para touchscreens */
+  min-width: 44px;
+  min-height: 44px;
+}
+.settings-btn:active {
+  background-color: #e2e8f0;
+}
+
+/* Área Central */
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  padding: 24px 0;
+}
+
+/* Cartão de Status */
+.status-card {
+  background-color: #ffffff;
+  width: 100%;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-top: 8px solid #e2e8f0;
+  transition:
+    background-color 0.4s ease,
+    border-color 0.4s ease,
+    color 0.4s ease;
+}
+
+.indicator-ring {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #f8fafc;
+  border: 12px solid #e2e8f0;
+  margin-bottom: 32px;
+  transition:
+    border-color 0.4s ease,
+    background-color 0.4s ease;
+}
+
+.status-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+  transition: color 0.4s ease;
+}
+
+.status-message {
+  font-size: 4rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+  text-transform: uppercase;
+  transition: color 0.4s ease;
+  word-wrap: break-word;
+  padding: 0 10px;
+}
+
+/* Cores de Estado */
+.card-red {
+  background-color: #ef4444;
+  border-top-color: #b91c1c;
+  animation: alert-light-red 2s ease-in-out infinite;
+}
+.card-red .indicator-ring {
+  border-color: #ffffff;
+  background-color: #b91c1c;
+}
+.card-red .status-title {
+  color: #fee2e2;
+}
+.card-red .status-message {
+  color: #ffffff;
+}
+
+.card-yellow {
+  background-color: #f59e0b;
+  border-top-color: #b45309;
+  animation: alert-light-yellow 4s ease-in-out infinite;
+}
+.card-yellow .indicator-ring {
+  border-color: #ffffff;
+  background-color: #d97706;
+}
+.card-yellow .status-title {
+  color: #fef3c7;
+}
+.card-yellow .status-message {
+  color: #ffffff;
+}
+
+.card-green {
+  background-color: #10b981;
+  border-top-color: #047857;
+}
+.card-green .indicator-ring {
+  border-color: #ffffff;
+  background-color: #059669;
+}
+.card-green .status-title {
+  color: #d1fae5;
+}
+.card-green .status-message {
+  color: #ffffff;
+}
+
+/* Indicador visual de conexão */
+.connection-status {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ef4444;
+}
+.dot.connected {
+  background-color: #10b981;
+}
+
+/* MODAL DE CONFIGURAÇÕES (Centralizado com Desfoque) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  padding: 20px;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 24px;
+  padding: 24px;
+  transform: scale(0.95);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.modal-title {
+  font-size: 1.4rem;
+  color: #0f172a;
+  font-weight: bold;
+}
+.close-btn {
+  background: #f1f5f9;
+  border: none;
+  font-size: 1.8rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.close-btn:active {
+  background: #e2e8f0;
+}
+
+.settings-group {
+  margin-bottom: 24px;
+}
+.settings-group label {
+  font-weight: 600;
+  color: #475569;
+  font-size: 1.1rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.touch-select {
+  width: 100%;
+  height: 56px;
+  font-size: 1.1rem;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  background-color: #f8fafc;
+  color: #0f172a;
+  outline: none;
+}
+.touch-select:focus {
+  border-color: #0097a7;
+}
+
+.refresh-btn {
+  padding: 8px 16px;
+  height: 44px;
+  background: #0097a7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.refresh-btn:active {
+  background: #007a87;
+}
+
+/* Barra de Volume */
+.volume-track {
+  width: 100%;
+  height: 24px;
+  background: #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.volume-fill {
+  width: 0%;
+  height: 100%;
+  background: #10b981;
+  transition:
+    width 0.05s linear,
+    background-color 0.3s ease;
+}
+
+/* Animação de giro da engrenagem */
+@keyframes spin-gear {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.settings-btn.spin svg {
+  animation: spin-gear 0.5s ease-in-out;
+}
+
+/* Animações */
+@keyframes alert-light-red {
+  0%,
+  100% {
+    background-color: #ef4444;
+    box-shadow: 0 0 40px rgba(239, 68, 68, 0.8);
+  }
+  50% {
+    background-color: #991b1b;
+    box-shadow: 0 0 10px rgba(153, 27, 27, 0.2);
+  }
+}
+@keyframes alert-light-yellow {
+  0%,
+  100% {
+    background-color: #f59e0b;
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.6);
+  }
+  50% {
+    background-color: #b45309;
+    box-shadow: 0 0 10px rgba(180, 83, 9, 0.1);
+  }
+}

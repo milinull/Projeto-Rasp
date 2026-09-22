@@ -16,6 +16,7 @@ class ServidorWebSocket:
         self.estado_atual = "green"
         self.volume_atual = 0.0
         self.novo_mic_id = None
+        self.ganho_adicional = 0.0
 
     def atualizar_estado(self, novo_estado: str, volume: float = 0.0):
         self.estado_atual = novo_estado
@@ -86,6 +87,9 @@ class ServidorWebSocket:
 
                 elif dados.get("comando") == "trocar_microfone":
                     self.novo_mic_id = int(dados.get("id"))
+
+                elif dados.get("comando") == "alterar_ganho":
+                    self.ganho_adicional = float(dados.get("valor"))
 
         except websockets.exceptions.ConnectionClosed:
             pass

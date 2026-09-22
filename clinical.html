@@ -69,6 +69,7 @@
           <button id="btn-close-settings" class="close-btn">&times;</button>
         </div>
 
+        <!-- 1. Selecionar Dispositivo -->
         <div class="settings-group">
           <div
             style="
@@ -84,10 +85,40 @@
           </div>
           <select id="mic-select" class="touch-select">
             <option value="">Selecione um microfone...</option>
-            <!-- As opções de microfone serão inseridas aqui pelo JS futuramente -->
           </select>
         </div>
 
+        <!-- 2. Ganho do Microfone -->
+        <div class="settings-group">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 12px;
+            "
+          >
+            <label for="gain-slider" style="margin-bottom: 0"
+              >Ganho do Microfone</label
+            >
+            <span
+              id="gain-value"
+              style="font-weight: 600; color: #0097a7; font-size: 1.1rem"
+              >0</span
+            >
+          </div>
+          <input
+            type="range"
+            id="gain-slider"
+            class="touch-slider"
+            min="-15"
+            max="15"
+            value="0"
+            step="1"
+          />
+        </div>
+
+        <!-- 3. Teste de Nível -->
         <div class="settings-group">
           <label>Teste de Nível do Microfone</label>
           <div class="volume-track">

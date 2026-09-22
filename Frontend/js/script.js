@@ -41,15 +41,36 @@ const modalOverlay = document.getElementById("settings-modal");
 
 const micSelect = document.getElementById("mic-select");
 
+const gainSlider = document.getElementById("gain-slider");
+const gainValue = document.getElementById("gain-value");
+
+// Envia o novo ganho em tempo real ao mover a barra
+gainSlider.addEventListener("input", (e) => {
+  const value = e.target.value;
+  gainValue.textContent = value > 0 ? `+${value}` : value;
+
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(
+      JSON.stringify({ comando: "alterar_ganho", valor: parseInt(value) }),
+    );
+  }
+});
+
+// Modifica o evento do select para resetar o ganho ao trocar de microfone
 micSelect.addEventListener("change", (e) => {
   if (e.target.value !== "" && ws && ws.readyState === WebSocket.OPEN) {
-    // Envia o novo ID escolhido para o servidor Python
+    // Envia o comando do novo mic
     ws.send(
       JSON.stringify({
         comando: "trocar_microfone",
         id: parseInt(e.target.value),
       }),
     );
+
+    // Força a barra de ganho a voltar para o zero
+    gainSlider.value = 0;
+    gainValue.textContent = "0";
+    ws.send(JSON.stringify({ comando: "alterar_ganho", valor: 0 }));
   }
 });
 

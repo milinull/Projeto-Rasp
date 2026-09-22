@@ -56,8 +56,11 @@ def callback(
     if status:
         print(status, file=sys.stderr)
 
-    # Amplifica e calcula RMS
-    sinal_amplificado = np.clip(indata * DIGITAL_GAIN, -1.0, 1.0)
+    # O max(0.0) garante que o ganho nunca seja negativo (no máximo chega a 0.0, silenciando o áudio)
+    ganho_dinamico = max(0.0, DIGITAL_GAIN + ws_server.ganho_adicional)
+
+    # Amplifica o áudio usando o ganho dinâmico e calcula o RMS
+    sinal_amplificado = np.clip(indata * ganho_dinamico, -1.0, 1.0)
     rms = np.sqrt(np.mean(sinal_amplificado**2))
 
     if rms < NOISE_GATE:

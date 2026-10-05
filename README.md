@@ -1,4 +1,4 @@
-# Monitoramento Acústico Hospitalar (UTI)
+# AcoustiCare (Monitoramento Acústico Hospitalar)
 
 Este projeto implementa um sistema de telemetria e microfonação focado em Unidades de Terapia Intensiva (UTI). O objetivo é monitorar continuamente (24/7) o nível de ruído no ambiente, fornecendo feedback visual imediato para a equipe médica por meio de um painel clínico e registrando os dados em um banco de dados de séries temporais para futuras auditorias e gestão acústica.
 
